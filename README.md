@@ -1,7 +1,7 @@
 
-# Text Simplifier
+# Quiz Wiz
 
-✨ Text Genie is your smart writing buddy that instantly simplifies or summarizes any text right where you are. Just highlight your text, choose your goal — shorter, clearer, or simpler — and let the genie do the magic. Quick, effortless, and smart — reading and writing made easy for everyone.
+✨ QuizWiz Text Genie is your smart quiz-making buddy. Highlight any text or use the entire page, choose your goal — shorter, clearer, or simpler — and instantly turn it into a quiz. Quick, effortless, and smart — learning and testing made easy!
 
 
 ## Images
@@ -21,15 +21,15 @@ Text Summarization
 
 ## Features
 
-✨ Simplify & Summarize – Instantly simplify or summarize any selected text.
+✨ Simplify & Quiz-ify – Instantly simplify, summarize, or turn any selected text or page into a quiz.
 
-⚡ One-Click Magic – Just highlight, right-click, and get results in seconds.
+⚡ One-Click Magic – Highlight text or use the whole page, right-click, and get quizzes in seconds.
 
-📝 Smart & Clear – Turns complex text into easy-to-read content instantly.
+📝 Smart & Clear – Converts complex text into clear, easy-to-understand questions.
 
-🎯 Accurate & Reliable – Keeps the meaning intact while simplifying.
+🎯 Accurate & Reliable – Keeps the original meaning intact while creating quizzes.
 
-🌟 For Everyone – Perfect for students, professionals, or casual readers.
+🌟 For Everyone – Perfect for students, learners, or anyone who wants quick quizzes.
 
 ## Deployment
 
