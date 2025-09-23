@@ -15,8 +15,61 @@ function showQuizSidebar(questionsCount, sourceText) {
   sidebar.style.borderLeft = "2px solid #ccc";
   sidebar.style.zIndex = "999999";
   sidebar.style.overflowY = "auto";
-  sidebar.style.padding = "20px";
-  sidebar.style.fontFamily = "Arial, sans-serif";
+  sidebar.style.fontSize = "16px";
+  sidebar.style.display = "flex";
+  sidebar.style.flexDirection = "column";
+
+  // Header with close button
+  const header = document.createElement("div");
+  header.style.position = "relative";
+  header.style.flex = "0 0 auto";
+  header.style.padding = "10px 20px";
+  header.style.borderBottom = "1px solid #ccc";
+  header.style.background = "#f9f9f9";
+
+  const title = document.createElement("h2");
+  title.textContent = "Quiz Wiz";
+  title.style.margin = "0";
+  title.style.fontSize = "18px";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "✖";
+  closeBtn.style.position = "absolute";
+  closeBtn.style.top = "10px";
+  closeBtn.style.right = "10px";
+  closeBtn.style.background = "#ff4444";
+  closeBtn.style.color = "white";
+  closeBtn.style.border = "none";
+  closeBtn.style.borderRadius = "5px";
+  closeBtn.style.padding = "5px 10px";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.style.transition = "all 0.2s ease";
+
+  closeBtn.addEventListener("mouseenter", () => {
+    closeBtn.style.background = "#ff2222";
+    closeBtn.style.transform = "scale(1.1)";
+  });
+  closeBtn.addEventListener("mouseleave", () => {
+    closeBtn.style.background = "#ff4444";
+    closeBtn.style.transform = "scale(1)";
+  });
+  closeBtn.addEventListener("click", () => sidebar.remove());
+
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  sidebar.appendChild(header);
+
+  // Content area (questions/results will go here)
+  const quizContent = document.createElement("div");
+  quizContent.id = "quiz-content";
+  quizContent.style.flex = "1 1 auto";
+  quizContent.style.overflowY = "auto";
+  quizContent.style.padding = "20px";
+  quizContent.style.background="linear-gradient(135deg, #003366, #0f52ba)";
+  quizContent.style.color="white"
+  sidebar.appendChild(quizContent);
+
+  quizContent.innerHTML = "<p>Loading quiz...</p>";
 
   document.body.appendChild(sidebar);
 
@@ -25,91 +78,96 @@ function showQuizSidebar(questionsCount, sourceText) {
 
 // Fetch questions from API
 async function fetchQuizQuestions(questionsCount, sourceText) {
-  const sidebar = document.getElementById("quiz-sidebar");
-  sidebar.innerHTML = "<p>Loading quiz...</p>";
+  const quizContent = document.getElementById("quiz-content");
+
+  const apiKey = "AIzaSyBXkv9L7vBYs3T4cqyNuOLfrCJB5Gj-IWE";
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer sk-or-v1-ba1fbdfd790c42f4ff34451c35659303964f84016ede6f13c6e828",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "qwen/qwen3-coder:free",
-        messages: [
-          {
-            role: "user",
-            content: `Generate ${questionsCount} multiple-choice quiz questions from the following text:\n"${sourceText}"\nUse this format:
-<question>Question text</question>
-<option>Option 1</option>
-<option>Option 2</option>
-<option>Option 3</option>
-<answer>Correct option text</answer>
-Repeat for all questions.`
-          }
-        ]
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Generate exactly ${questionsCount} multiple-choice quiz questions from the following text:\n\n"${sourceText}"\n\nIMPORTANT: Use EXACTLY this format for each question:
+<question>Question text here</question>
+<option>Option A</option>
+<option>Option B</option>
+<option>Option C</option>
+<option>Option D</option>
+<answer>Option A</answer>`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+          },
+        }),
+      }
+    );
 
-    const data = await response.json();
-    const rawContent = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || "";
-    if (!rawContent) {
-      sidebar.innerHTML = "<p>⚠️ API did not return quiz content.</p>";
-      console.error("No content in API response:", data);
+    if (!response.ok) {
+      const errorText = await response.text();
+      quizContent.innerHTML = `<p>⚠️ Gemini API Error (${response.status}): ${response.statusText}</p>`;
+      console.error("Gemini API Error:", response.status, response.statusText, errorText);
       return;
     }
 
-    // Parse custom tags
-    const quizData = [];
+    const data = await response.json();
+    console.log("Gemini API Response:", data);
+
+    const rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     const questions = rawContent.match(/<question>.*?<\/answer>/gs);
+
     if (!questions) {
-      sidebar.innerHTML = "<p>⚠️ Could not parse quiz from API.</p>";
+      quizContent.innerHTML = `<p>⚠️ Could not parse quiz.</p>`;
       console.error("Parsing failed:", rawContent);
       return;
     }
 
-    questions.forEach(block => {
+    const quizData = questions.map((block) => {
       const qMatch = /<question>(.*?)<\/question>/s.exec(block);
-      const opts = [...block.matchAll(/<option>(.*?)<\/option>/g)].map(m => m[1]);
+      const opts = [...block.matchAll(/<option>(.*?)<\/option>/g)].map((m) => m[1].trim());
       const aMatch = /<answer>(.*?)<\/answer>/s.exec(block);
-
-      if (qMatch && opts.length && aMatch) {
-        quizData.push({
-          question: qMatch[1].trim(),
-          options: opts,
-          answer: aMatch[1].trim()
-        });
-      }
+      return {
+        question: qMatch?.[1]?.trim() || "",
+        options: opts.slice(0, 4),
+        answer: aMatch?.[1]?.trim() || "",
+      };
     });
 
     renderQuizOneByOne(quizData);
-  } catch (error) {
-    console.error("Error fetching quiz:", error);
-    sidebar.innerHTML = "<p>⚠️ Error fetching quiz. Check console for details.</p>";
+  } catch (err) {
+    console.error("Error fetching quiz:", err);
+    document.getElementById("quiz-content").innerHTML = "<p>⚠️ Error fetching quiz.</p>";
   }
 }
 
 // Render quiz one question at a time
 function renderQuizOneByOne(questions) {
-  const sidebar = document.getElementById("quiz-sidebar");
-  sidebar.innerHTML = "<h2>Quiz Time</h2>";
-
+  const quizContent = document.getElementById("quiz-content");
   let currentIndex = 0;
   const userAnswers = [];
 
   function showQuestion(index) {
-    sidebar.innerHTML = `<h2>Quiz Time</h2>`;
-    const q = questions[index];
+    quizContent.innerHTML = "";
 
+    const q = questions[index];
     const div = document.createElement("div");
-    div.style.marginBottom = "15px";
 
     const question = document.createElement("p");
     question.textContent = `${index + 1}. ${q.question}`;
     div.appendChild(question);
 
-    q.options.forEach(opt => {
+    q.options.forEach((opt) => {
       const label = document.createElement("label");
       label.style.display = "block";
 
@@ -123,24 +181,22 @@ function renderQuizOneByOne(questions) {
       div.appendChild(label);
     });
 
-    sidebar.appendChild(div);
+    quizContent.appendChild(div);
+
+
+    
 
     const nextBtn = document.createElement("button");
     nextBtn.textContent = index === questions.length - 1 ? "Submit Quiz" : "Next";
     nextBtn.style.marginTop = "10px";
-    sidebar.appendChild(nextBtn);
+    quizContent.appendChild(nextBtn);
 
     nextBtn.addEventListener("click", () => {
       const selected = div.querySelector(`input[name="q${index}"]:checked`);
       userAnswers[index] = selected ? selected.value : null;
 
       if (index === questions.length - 1) {
-        // Show score
-        let score = 0;
-        questions.forEach((q, i) => {
-          if (userAnswers[i] === q.answer) score++;
-        });
-        sidebar.innerHTML = `<h2>Your Score: ${score}/${questions.length}</h2>`;
+        renderResults(questions, userAnswers);
       } else {
         currentIndex++;
         showQuestion(currentIndex);
@@ -151,13 +207,37 @@ function renderQuizOneByOne(questions) {
   showQuestion(currentIndex);
 }
 
-// Listen for messages
+// Render results
+function renderResults(questions, userAnswers) {
+  const quizContent = document.getElementById("quiz-content");
+  let score = 0;
+  let resultHtml = `<h2>Results</h2>`;
+
+  questions.forEach((q, i) => {
+    const userAnswer = userAnswers[i] || "Not answered";
+    const correctAnswer = q.answer;
+    const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+    if (isCorrect) score++;
+
+    resultHtml += `
+      <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+        <p><strong>Q${i + 1}:</strong> ${q.question}</p>
+        <p>Your Answer: <span style="color:${isCorrect ? "green" : "red"}">${userAnswer}</span></p>
+        <p>Correct Answer: <span style="color:green">${correctAnswer}</span></p>
+      </div>
+    `;
+  });
+
+  resultHtml += `<h3>Final Score: ${score}/${questions.length}</h3>`;
+  quizContent.innerHTML = resultHtml;
+}
+
+// Listen for messages from extension
 chrome.runtime.onMessage.addListener((request) => {
   if (request.action === "startQuiz") {
     let sourceText = "";
 
-    // Get text depending on textSource from popup.js
-    if (request.textSource === "selectedText") {
+    if (request.textSource === "selected") {
       sourceText = window.getSelection().toString().trim();
       if (!sourceText) sourceText = document.body.innerText || "No content available";
     } else {

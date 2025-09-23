@@ -6,6 +6,9 @@
       body {
         font-family: Arial, sans-serif;
         padding: 10px;
+        background: linear-gradient(135deg, #003366, #0f52ba);
+        color: #ffffff;
+
       }
       h2 {
         margin-bottom: 10px;
@@ -14,11 +17,20 @@
         display: block;
         margin: 8px 0 4px;
       }
-      input {
+      input[type="number"] {
         width: 60px;
         padding: 4px;
         margin-bottom: 10px;
       }
+
+      /* Flex container for horizontal radio buttons */
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
       button {
         padding: 6px 12px;
         cursor: pointer;
@@ -26,7 +38,12 @@
     </style>
   </head>
   <body>
-    <h2>QuizWiz</h2>
+   <div> 
+  <h2 style="text-align: center; font-size: 25px; font-family: Arial, sans-serif; color: #ffffff;">
+    QuizWiz
+  </h2>
+</div>
+
 
     <label for="questionCount">Number of Questions :</label>
     <input
@@ -38,10 +55,13 @@
     />
 
     <label>Text Source:</label>
-    <input type="radio" id="entirePage" name="textSource" value="entire" checked>
-    <label for="entirePage">Entire Page</label><br>
-    <input type="radio" id="selectedText" name="textSource" value="selected">
-    <label for="selectedText">Selected Text</label><br>
+    <div class="radio-group">
+      <input type="radio" id="entirePage" name="textSource" value="entire" checked>
+      <label for="entirePage">Entire Page</label>
+
+      <input type="radio" id="selectedText" name="textSource" value="selected">
+      <label for="selectedText">Selected Text</label>
+    </div>
 
     <button id="startQuiz">Start Quiz</button>
 
