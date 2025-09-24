@@ -6,13 +6,16 @@
 
 ## Images
 
-Text Simplification
+Starting quiz
 
-![Simplify Demo](/project1.png)
+(/project1.png)
 
-Text Summarization
+Quiz
 
-![Recipe Genie Demo](/project2.png)
+(/project2.png)
+
+Quiz Result
+(/project3.png)
 
 
 
