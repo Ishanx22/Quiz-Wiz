@@ -70,6 +70,6 @@ Html,Css,js
 ` and replace line 83 with your key:
 
 ```javascript
-"const apiKey = "[Your Gemini api Key]" ";
+"const apiKey = "[Your Gemini api Key]";";
 
 
