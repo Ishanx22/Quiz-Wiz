@@ -63,12 +63,11 @@ Html,Css,js
 
 ### Setup: API Key
 
-1. Get your DeepSeek (R1 Free) API key:  
-   [https://openrouter.ai/deepseek/deepseek-r1:free/api](https://openrouter.ai/deepseek/deepseek-r1:free/api)
+1. Get your Gemini API key:  
+   
 
-2. Open `text-simplifier-chrome-extension/text-simplifier-extension
-/background.js
-` and replace line 133,167 with your key:
+2. Open `Quiz-Wiz/content.js'
+` and replace line 83 with your key:
 
 ```javascript
 "Authorization": "Bearer [Your API Key]";
