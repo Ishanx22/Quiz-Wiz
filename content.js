@@ -80,7 +80,7 @@ function showQuizSidebar(questionsCount, sourceText) {
 async function fetchQuizQuestions(questionsCount, sourceText) {
   const quizContent = document.getElementById("quiz-content");
 
-  const apiKey = "AIzaSyBXkv9L7vBYs3T4cqyNuOLfrCJB5Gj-IWE";
+  const apiKey = "[Your Gemini api Key]";
 
   try {
     const response = await fetch(
@@ -247,3 +247,4 @@ chrome.runtime.onMessage.addListener((request) => {
     showQuizSidebar(request.questions, sourceText);
   }
 });
+
