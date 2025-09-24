@@ -12,11 +12,11 @@ Starting a  Quiz
 
 Quiz
 
-![Quiz](/project2.png)
+![Quiz](/project3.png)
 
 Quiz Result
 
-![Quiz Result](/project3.png)
+![Quiz Result](/project2.png)
 
 
 
