@@ -8,14 +8,14 @@
 
 Starting quiz
 
-(/project1.png)
+!(/project1.png)
 
 Quiz
 
-(/project2.png)
+!(/project2.png)
 
 Quiz Result
-(/project3.png)
+!(/project3.png)
 
 
 
