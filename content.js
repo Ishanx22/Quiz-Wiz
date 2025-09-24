@@ -80,7 +80,7 @@ function showQuizSidebar(questionsCount, sourceText) {
 async function fetchQuizQuestions(questionsCount, sourceText) {
   const quizContent = document.getElementById("quiz-content");
 
-  const apiKey = "[Your Gemini api Key]";
+  const apiKey = "[Your api Key]";
 
   try {
     const response = await fetch(
@@ -137,10 +137,21 @@ async function fetchQuizQuestions(questionsCount, sourceText) {
       const qMatch = /<question>(.*?)<\/question>/s.exec(block);
       const opts = [...block.matchAll(/<option>(.*?)<\/option>/g)].map((m) => m[1].trim());
       const aMatch = /<answer>(.*?)<\/answer>/s.exec(block);
+      let answer = aMatch?.[1]?.trim() || "";
+
+      // If answer is "Option A", "Option B", etc., map to actual option text
+      const optionMatch = answer.match(/^Option ([A-D])$/i);
+      if (optionMatch) {
+        const idx = "ABCD".indexOf(optionMatch[1].toUpperCase());
+        if (idx !== -1 && opts[idx]) {
+          answer = opts[idx];
+        }
+      }
+
       return {
         question: qMatch?.[1]?.trim() || "",
         options: opts.slice(0, 4),
-        answer: aMatch?.[1]?.trim() || "",
+        answer,
       };
     });
 
@@ -216,7 +227,7 @@ function renderResults(questions, userAnswers) {
   questions.forEach((q, i) => {
     const userAnswer = userAnswers[i] || "Not answered";
     const correctAnswer = q.answer;
-    const isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+    const isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
     if (isCorrect) score++;
 
     resultHtml += `
@@ -247,4 +258,3 @@ chrome.runtime.onMessage.addListener((request) => {
     showQuizSidebar(request.questions, sourceText);
   }
 });
-
