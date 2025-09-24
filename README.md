@@ -6,16 +6,20 @@
 
 ## Images
 
-Starting quiz
+Starting a  Quiz
 
-!(/project1.png)
+![Quiz start](/project1.png)
 
 Quiz
 
-!(/project2.png)
+![Quiz](/project2.png)
 
 Quiz Result
-!(/project3.png)
+
+![Quiz Result](/project3.png)
+
+
+
 
 
 
